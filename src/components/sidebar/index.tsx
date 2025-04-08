@@ -1,82 +1,49 @@
-'use client';
+import { Search, Pencil, ListCheck } from 'lucide-react';
+import { headers } from 'next/headers';
 import {
-    Calendar,
-    Home,
-    Inbox,
-    Search,
-    Settings,
-    NotepadTextIcon,
-} from 'lucide-react';
-import {
-    Sidebar,
+    Sidebar as UISidebar,
     SidebarContent,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
 } from '../ui/sidebar';
 import { Button } from '../ui/button';
-import { useCallback, useState } from 'react';
 import { Input } from '../ui/input';
+import Link from 'next/link';
 
-const items = [
-    {
-        title: 'Home',
-        url: '#',
-        icon: Home,
-    },
-    {
-        title: 'Inbox',
-        url: '#',
-        icon: Inbox,
-    },
-    {
-        title: 'Calendar',
-        url: '#',
-        icon: Calendar,
-    },
-    {
-        title: 'Search',
-        url: '#',
-        icon: Search,
-    },
-    {
-        title: 'Settings',
-        url: '#',
-        icon: Settings,
-    },
-];
+async function Sidebar() {
+    const headersList = await headers();
 
-type Tabs = 'notes' | 'boards';
-
-function AppSidebar() {
-    const [selected, setSelected] = useState<Tabs>('boards');
-
-    const handleChangeState = useCallback((tab: Tabs) => {
-        setSelected(tab);
-    }, []);
+    const pathname = headersList.get('referer')?.split('application')[1] || '';
 
     return (
-        <Sidebar>
+        <UISidebar>
             <SidebarHeader className="mt-20 flex gap-10 justify-center flex-row">
                 <Button
                     size="xl"
                     className="w-16"
-                    variant={selected == 'boards' ? 'default' : 'outline'}
-                    onClick={() => handleChangeState('boards')}
+                    variant={
+                        pathname.includes('boards') ? 'default' : 'outline'
+                    }
+                    title="Suas listas de tarefas"
+                    asChild
                 >
-                    <Calendar className="size-6" />
+                    <Link href="/application/boards">
+                        <ListCheck className="size-6" />
+                    </Link>
                 </Button>
                 <Button
                     size="xl"
                     className="w-16"
-                    variant={selected == 'notes' ? 'default' : 'outline'}
-                    onClick={() => handleChangeState('notes')}
+                    variant={pathname.includes('notes') ? 'default' : 'outline'}
+                    title="Suas anotações"
+                    asChild
                 >
-                    <NotepadTextIcon className="size-6" />
+                    <Link href="/application/notes">
+                        <Pencil className="size-6" />
+                    </Link>
                 </Button>
             </SidebarHeader>
             <SidebarContent>
@@ -91,7 +58,7 @@ function AppSidebar() {
                     </div>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map(item => (
+                            {/* {items.map(item => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
                                         <a href={item.url}>
@@ -100,13 +67,13 @@ function AppSidebar() {
                                         </a>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
-                            ))}
+                            ))} */}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-        </Sidebar>
+        </UISidebar>
     );
 }
 
-export { AppSidebar };
+export { Sidebar };
