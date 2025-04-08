@@ -10,6 +10,7 @@ import {
 import { Button } from '../ui/button';
 import { PersonIcon } from '../icons';
 import { signOut } from 'next-auth/react';
+import { LogOut, Settings } from 'lucide-react';
 
 function HeaderDropdown() {
     const handleSignOut = async () => {
@@ -29,12 +30,17 @@ function HeaderDropdown() {
             <DropdownMenuContent>
                 <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem className="justify-between cursor-pointer">
+                    Configurações
+                    <Settings />
+                </DropdownMenuItem>
                 <DropdownMenuItem
                     variant="destructive"
                     onClick={handleSignOut}
-                    className="cursor-pointer"
+                    className="cursor-pointer justify-between"
                 >
                     Logout
+                    <LogOut />
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

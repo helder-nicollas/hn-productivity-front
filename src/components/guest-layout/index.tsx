@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 async function GuestLayout({ children }: { children: React.ReactNode }) {
     const session = await getServerSession();
 
-    if (session) redirect('/boards');
+    if (session) redirect('/application/boards');
 
     return children;
 }

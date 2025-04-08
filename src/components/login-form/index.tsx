@@ -42,17 +42,17 @@ export function LoginForm() {
             email,
             password,
             redirect: false,
-            callbackUrl: '/boards',
+            callbackUrl: '/application/boards',
         });
 
-        if (!(result?.status === 401)) {
+        if (result?.status === 401) {
             return setError('root', {
                 message: 'Usuário e/ou senha incorretos',
             });
         }
 
         if (!result?.ok) {
-            console.log(result.error);
+            console.log(result?.error);
             return setError('root', {
                 message: 'Usuário e/ou senha incorretos',
             });
