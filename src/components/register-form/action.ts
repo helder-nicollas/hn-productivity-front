@@ -6,18 +6,12 @@ import { FormSchema, formSchema } from './schema';
 import { IFieldErrors } from './schema';
 import { fetcher } from '@/utils/api';
 
-interface IResponse {
-    email?: string;
-    password?: string;
-}
-
 export async function registerUser(
     _state: unknown,
     formData: FormData,
-): Promise<IActionResponseWithData<IResponse, IFieldErrors>> {
+): Promise<IActionResponseWithData<Partial<FormSchema>, IFieldErrors>> {
+    const data = Object.fromEntries(formData) as FormSchema;
     try {
-        const data = Object.fromEntries(formData) as FormSchema;
-
         const result = formSchema.safeParse(data);
 
         if (result.error)
@@ -37,6 +31,7 @@ export async function registerUser(
         return {
             type: 'success',
             data: {
+                name: data.name,
                 email: data.email,
                 password: data.password,
             },
@@ -46,7 +41,11 @@ export async function registerUser(
         return {
             type: 'serverError',
             message: `Erro: ${err.message}`,
-            data: {},
+            data: {
+                name: data.name,
+                email: data.email,
+                password: data.password,
+            },
         };
     }
 }

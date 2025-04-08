@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { Loading } from '../loading';
 import Link from 'next/link';
 import { EnvelopeIcon, PasswordIcon } from '../icons';
+import { Alert } from '../alert';
 
 const formSchema = z.object({
     email: z
@@ -28,6 +29,7 @@ export function LoginForm() {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
+        setError,
     } = useForm<FormSchema>({
         resolver: zodResolver(formSchema),
         reValidateMode: 'onSubmit',
@@ -43,8 +45,17 @@ export function LoginForm() {
             callbackUrl: '/boards',
         });
 
+        if (!(result?.status === 401)) {
+            return setError('root', {
+                message: 'Usuário e/ou senha incorretos',
+            });
+        }
+
         if (!result?.ok) {
-            return console.log(result?.error);
+            console.log(result.error);
+            return setError('root', {
+                message: 'Usuário e/ou senha incorretos',
+            });
         }
         return router.replace('/boards');
     };
@@ -55,6 +66,7 @@ export function LoginForm() {
             className="w-full flex flex-col"
         >
             <h1 className="text-4xl font-bold mb-6 text-center">Login</h1>
+            <Alert message={errors.root?.message} className="mb-3" />
             <div className="space-y-4">
                 <div className="space-y-1 relative">
                     <Label>E-mail</Label>

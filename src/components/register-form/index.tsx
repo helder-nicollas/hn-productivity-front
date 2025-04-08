@@ -39,12 +39,17 @@ function RegisterForm() {
     return (
         <form action={dispatch} className="w-full flex flex-col">
             <h1 className="text-4xl font-bold mb-6 text-center">Criar conta</h1>
-            <Alert message={state?.message} />
+            <Alert message={state?.message} className="mb-3" />
             <div className="space-y-4">
                 <div className="space-y-1">
                     <Label htmlFor="name">Nome</Label>
                     <div className="relative">
-                        <Input name="name" id="name" className="h-12" />
+                        <Input
+                            name="name"
+                            id="name"
+                            className="h-12"
+                            defaultValue={state?.data.name}
+                        />
                         <PersonIcon className="absolute top-[30%] w-5 h-5 right-4 opacity-25" />
                     </div>
                     <Feedback message={state?.errors?.name?.[0]} />
@@ -52,7 +57,12 @@ function RegisterForm() {
                 <div className="space-y-1">
                     <Label htmlFor="email">E-mail</Label>
                     <div className="relative">
-                        <Input name="email" id="email" className="h-12" />
+                        <Input
+                            name="email"
+                            id="email"
+                            className="h-12"
+                            defaultValue={state?.data.email}
+                        />
                         <EnvelopeIcon className="absolute top-[30%] w-5 h-5 right-4 opacity-25" />
                     </div>
                     <Feedback message={state?.errors?.email?.[0]} />
@@ -65,6 +75,7 @@ function RegisterForm() {
                             id="password"
                             className="h-12"
                             type="password"
+                            defaultValue={state?.data.password}
                         />
                         <PasswordIcon className="absolute top-[30%] w-5 h-5 right-4 opacity-25" />
                     </div>
