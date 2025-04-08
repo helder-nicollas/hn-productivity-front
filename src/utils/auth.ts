@@ -46,7 +46,7 @@ export const authOptions: AuthOptions = {
         strategy: 'jwt',
     },
     pages: {
-        signIn: '/login',
+        signIn: '/auth',
     },
     callbacks: {
         async jwt({ token, user }) {

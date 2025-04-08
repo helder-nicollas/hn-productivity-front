@@ -1,3 +1,9 @@
+import { AuthLayout } from '@/components';
+
 export default function BoardsPage() {
-    return <h1>Boards</h1>;
+    return (
+        <AuthLayout>
+            <h1>Boards</h1>
+        </AuthLayout>
+    );
 }

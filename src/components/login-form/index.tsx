@@ -9,6 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Feedback } from '../feedback';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { Loading } from '../loading';
+import Link from 'next/link';
+import { EnvelopeIcon, PasswordIcon } from '../icons';
 
 const formSchema = z.object({
     email: z
@@ -47,21 +50,46 @@ export function LoginForm() {
     };
 
     return (
-        <div className="bg-secondary p-10 shadow-md rounded-md">
-            <h1 className="text-2xl font-bold">Login</h1>
-            <form onSubmit={handleSubmit(handleLogin)}>
-                <div className="space-y-1">
+        <form
+            onSubmit={handleSubmit(handleLogin)}
+            className="w-full flex flex-col"
+        >
+            <h1 className="text-4xl font-bold mb-6 text-center">Login</h1>
+            <div className="space-y-4">
+                <div className="space-y-1 relative">
                     <Label>E-mail</Label>
-                    <Input {...register('email')} />
-                    <Feedback message={errors?.email?.message} />
-                </div>
-                <div className="space-y-1">
-                    <Label>Senha</Label>
-                    <Input {...register('password')} type="password" />
+                    <Input {...register('email')} className="h-12" />
+                    <EnvelopeIcon className="absolute top-[48%] w-5 h-5 right-4 opacity-25" />
                     <Feedback message={errors?.password?.message} />
                 </div>
-                <Button disabled={isSubmitting}>Entrar</Button>
-            </form>
-        </div>
+                <div className="space-y-1 relative">
+                    <Label>Senha</Label>
+                    <Input
+                        {...register('password')}
+                        className="h-12"
+                        type="password"
+                    />
+                    <PasswordIcon className="absolute top-[48%] w-5 h-5 right-4 opacity-25" />
+                    <Feedback message={errors?.password?.message} />
+                </div>
+            </div>
+            <div className="my-2">
+                <Link
+                    className="text-blue-300 hover:underline cursor-pointer"
+                    href="#"
+                >
+                    Esqueceu a senha?
+                </Link>
+            </div>
+            <div className="mt-2 w-full">
+                <Button
+                    className="w-full font-bold text-lg"
+                    disabled={isSubmitting}
+                    size="xl"
+                >
+                    {isSubmitting ? <Loading /> : 'Entrar'}
+                </Button>
+            </div>
+        </form>
     );
 }
