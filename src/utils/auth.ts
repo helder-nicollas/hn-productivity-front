@@ -1,4 +1,4 @@
-import { AuthOptions, User } from 'next-auth';
+import { AuthOptions, getServerSession, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { fetcher } from './api';
 import { IUser } from '@/types/user';
@@ -56,12 +56,13 @@ export const authOptions: AuthOptions = {
             return { ...token, ...user };
         },
         async session({ session, token }) {
-            session.user = {
-                ...session.user,
-                id: token.id as string,
-                accessToken: token.accessToken as string,
-            };
+            session.user = token as unknown as User;
             return session;
         },
     },
 };
+
+export async function getSession() {
+    const session = await getServerSession(authOptions);
+    return session;
+}

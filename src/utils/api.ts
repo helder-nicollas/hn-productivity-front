@@ -21,7 +21,7 @@ export async function fetcher<T>(
         delete config.token;
     }
 
-    const response = await fetch(fullUrl, { ...config });
+    const response = await fetch(fullUrl, config);
 
     const data: T = await response.json();
 

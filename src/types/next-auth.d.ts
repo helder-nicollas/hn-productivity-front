@@ -15,8 +15,6 @@ declare module 'next-auth' {
     interface Session extends DefaultSession {
         user: User;
         expires_in: string;
-        refreshToken: string;
-        accessToken: string;
         error: string;
     }
 }

@@ -1,50 +1,104 @@
-import { Button } from '@/components/ui/button';
-import { BookCheckIcon } from 'lucide-react';
+import {
+    BoardHeaderInputs,
+    Section,
+    CreateBoard,
+    CreateSection,
+    Sidebar,
+} from '@/components';
+import { SidebarBoardsList, SidebarBoardsListSkeleton } from '@/components';
+import { Input } from '@/components/ui/input';
+import {
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarMenu,
+} from '@/components/ui/sidebar';
+import { IBoard } from '@/types/board';
+import { fetcher } from '@/utils/api';
+import { getSession } from '@/utils/auth';
+import { Search } from 'lucide-react';
+import { revalidatePath } from 'next/cache';
+import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function BoardsPage() {
+type BoardPageProps = {
+    params: {
+        boardId: string;
+    };
+};
+
+export default async function BoardsPage({ params }: BoardPageProps) {
+    const { boardId } = await params;
+    const session = await getSession();
+    const token = session?.user.accessToken as string;
+
+    const { data: board } = await fetcher<IBoard | null>(`/boards/${boardId}`, {
+        token,
+    });
+
+    if (!board) return notFound();
+
+    const createBoard = async () => {
+        'use server';
+        await fetcher('/boards', { token, method: 'POST' });
+        revalidatePath(`/application/boards/${boardId}`);
+    };
+
+    const createSection = async () => {
+        'use server';
+        await fetcher(`/boards/${boardId}/sections`, {
+            token,
+            method: 'POST',
+        });
+        revalidatePath(`/application/boards/${boardId}`);
+    };
+
     return (
-        <main className="mt-24 px-5 h-[calc(100% - 160px)] w-full pb-10 flex flex-col">
-            <header className="flex flex-col w-full">
-                <div className="flex gap-3 items-center mb-5">
-                    <BookCheckIcon className="size-7 opacity-50" />
-                    <input
-                        className="outline-0 text-2xl max-w-4xl w-full font-bold"
-                        placeholder="Board sem título"
-                    />
-                </div>
-                <textarea
-                    className="max-w-3xl outline-none resize-none"
-                    placeholder="Descreva seu board aqui..."
-                    rows={3}
-                ></textarea>
-                <Button
-                    className="w-48 shadow-md text-base"
-                    variant="outline"
-                    size="xl"
-                >
-                    Adicionar nova seção
-                </Button>
-            </header>
-            <hr className="my-5" />
-            <div className="flex gap-10 h-full">
-                <div className="bg-background border w-72 h-full rounded-xl shadow-md p-4">
-                    <input
-                        className="font-bold text-xl w-full outline-0"
-                        placeholder="Seção sem título"
-                    />
-                    <div className="mt-5">
-                        <div className="overflow-hidden rounded-md bg-secondary w-full shadow-md">
-                            <div className="bg-white h-8 w-full" />
-                            <div className="p-3">
-                                <h3 className="text-lg font-bold">
-                                    Task 01 Task 01 Task 01 Task 01 Task 01 Task
-                                    01
-                                </h3>
+        <>
+            <Sidebar>
+                <SidebarContent>
+                    <SidebarGroup>
+                        <SidebarGroupLabel className="text-base relative top-1">
+                            Seus Boards
+                        </SidebarGroupLabel>
+                        <CreateBoard action={createBoard} />
+                        <SidebarGroupContent className="mt-5">
+                            <div className="relative">
+                                <Input
+                                    placeholder="Pesquisar board..."
+                                    className="mb-3 h-10"
+                                />
+                                <Search className="absolute top-[10px] opacity-50 size-5 right-2" />
                             </div>
-                        </div>
-                    </div>
+                            <SidebarMenu>
+                                <Suspense
+                                    fallback={<SidebarBoardsListSkeleton />}
+                                >
+                                    <SidebarBoardsList
+                                        currentBoardId={boardId}
+                                    />
+                                </Suspense>
+                            </SidebarMenu>
+                        </SidebarGroupContent>
+                    </SidebarGroup>
+                </SidebarContent>
+            </Sidebar>
+            <main className="mt-24 px-5 h-[calc(100% - 160px)] w-full pb-10 flex flex-col">
+                <header className="flex flex-col w-full">
+                    <BoardHeaderInputs board={board} />
+                    <CreateSection action={createSection} />
+                </header>
+                <hr className="my-5" />
+                <div className="flex gap-10 h-full">
+                    {board.sections?.map(section => (
+                        <Section
+                            key={section.section_id}
+                            section={section}
+                        ></Section>
+                    ))}
                 </div>
-            </div>
-        </main>
+            </main>
+        </>
     );
 }

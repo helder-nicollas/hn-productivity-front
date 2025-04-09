@@ -1,23 +1,17 @@
-import { Search, Pencil, ListCheck } from 'lucide-react';
-import { headers } from 'next/headers';
-import {
-    Sidebar as UISidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-} from '../ui/sidebar';
+'use client';
+import { Pencil, ListCheck } from 'lucide-react';
+import { Sidebar as UISidebar, SidebarHeader } from '../ui/sidebar';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
-async function Sidebar() {
-    const headersList = await headers();
+type SidebarProps = {
+    children: ReactNode;
+};
 
-    const pathname = headersList.get('referer')?.split('application')[1] || '';
-
+function Sidebar({ children }: SidebarProps) {
+    const pathname = usePathname();
     return (
         <UISidebar>
             <SidebarHeader className="mt-20 flex gap-10 justify-center flex-row">
@@ -46,32 +40,7 @@ async function Sidebar() {
                     </Link>
                 </Button>
             </SidebarHeader>
-            <SidebarContent>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Seus Boards</SidebarGroupLabel>
-                    <div className="relative">
-                        <Input
-                            placeholder="Pesquisar board..."
-                            className="mb-3 mt-1 h-10"
-                        />
-                        <Search className="absolute top-[14px] opacity-50 size-5 right-2" />
-                    </div>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {/* {items.map(item => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))} */}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </SidebarContent>
+            {children}
         </UISidebar>
     );
 }
