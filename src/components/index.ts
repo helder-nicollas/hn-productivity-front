@@ -18,3 +18,4 @@ export * from './board-header-inputs';
 export * from './section';
 export * from './task';
 export * from './create-section';
+export * from './task-modal';

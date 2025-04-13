@@ -7,7 +7,7 @@ export default async function LoginPage() {
                     <Header.Logo />
                 </Container>
             </Header>
-            <main className="min-h-screen justify-center flex items-center">
+            <main className="min-h-screen justify-center w-full flex items-center">
                 <AuthContainer />
             </main>
         </GuestLayout>

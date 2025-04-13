@@ -1,9 +1,12 @@
 import { cn } from '@/lib/utils';
+import { ITask } from '@/types/task';
 import { ComponentProps } from 'react';
 
-type TaskProps = ComponentProps<'div'>;
+type TaskProps = ComponentProps<'div'> & {
+    task: ITask;
+};
 
-function Task({ ref, className, ...props }: TaskProps) {
+function Task({ ref, className, task, ...props }: TaskProps) {
     return (
         <div
             {...props}
@@ -13,11 +16,12 @@ function Task({ ref, className, ...props }: TaskProps) {
                 className,
             )}
         >
-            <div className="bg-white h-8 w-full" />
+            <div
+                className="h-8 w-full"
+                style={{ backgroundColor: task.color }}
+            />
             <div className="p-3">
-                <h3 className="text-lg font-bold">
-                    Task 01 Task 01 Task 01 Task 01 Task 01 Task 01
-                </h3>
+                <h3 className="text-lg font-bold">{task.title}</h3>
             </div>
         </div>
     );

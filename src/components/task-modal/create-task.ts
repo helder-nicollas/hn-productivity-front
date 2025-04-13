@@ -1,36 +1,40 @@
 'use server';
+
 import { IActionResponse } from '@/types/action-response';
+import { FieldErrors, FormSchema } from '.';
 import { fetcher } from '@/utils/api';
 import { getSession } from '@/utils/auth';
 import { revalidatePath } from 'next/cache';
 
-interface IDeleteActionParams {
+interface ICreateTaskParams extends FormSchema {
     boardId: string;
     sectionId: string;
 }
 
-export async function deleteSection({
-    sectionId,
+export async function createTask({
     boardId,
-}: IDeleteActionParams): Promise<IActionResponse> {
+    sectionId,
+    ...data
+}: ICreateTaskParams): Promise<IActionResponse<FieldErrors>> {
     try {
         const session = await getSession();
         const token = session?.user.accessToken as string;
 
-        await fetcher(`/boards/${boardId}/sections/${sectionId}/`, {
-            method: 'DELETE',
+        await fetcher(`/boards/${boardId}/sections/${sectionId}/tasks`, {
+            method: 'POST',
+            body: JSON.stringify(data),
             token,
         });
 
         revalidatePath('/');
         return {
-            message: 'Seção deletada com sucesso.',
+            message: 'Tarefa criada com sucesso.',
             type: 'success',
         };
     } catch (err) {
         console.log(err);
         return {
-            message: 'Algo deu errado ao deletar esta seção.',
+            message: 'Algo deu errado ao criar esta tarefa.',
             type: 'serverError',
         };
     }

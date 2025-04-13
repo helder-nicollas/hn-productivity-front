@@ -10,21 +10,21 @@ export default async function AppLayout({
     const cookieStore = await cookies();
     const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true';
     return (
-        // <AuthLayout>
-        <SidebarProvider defaultOpen={defaultOpen}>
-            <Header>
-                <div className="flex justify-between w-full pl-3 pr-5">
-                    <div className="flex gap-2 items-center">
-                        <SidebarTrigger variant="ghost"></SidebarTrigger>
-                        <Header.Logo />
+        <AuthLayout>
+            <SidebarProvider defaultOpen={defaultOpen}>
+                <Header>
+                    <div className="flex justify-between w-full pl-3 pr-5">
+                        <div className="flex gap-2 items-center">
+                            <SidebarTrigger variant="ghost"></SidebarTrigger>
+                            <Header.Logo />
+                        </div>
+                        <div className="flex gap-2">
+                            <Header.Dropdown />
+                        </div>
                     </div>
-                    <div className="flex gap-2">
-                        <Header.Dropdown />
-                    </div>
-                </div>
-            </Header>
-            {children}
-        </SidebarProvider>
-        // </AuthLayout>
+                </Header>
+                {children}
+            </SidebarProvider>
+        </AuthLayout>
     );
 }

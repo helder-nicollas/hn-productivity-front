@@ -4,6 +4,8 @@ import {
     CreateBoard,
     CreateSection,
     Sidebar,
+    TaskModal,
+    Task,
 } from '@/components';
 import { SidebarBoardsList, SidebarBoardsListSkeleton } from '@/components';
 import { Input } from '@/components/ui/input';
@@ -92,12 +94,16 @@ export default async function BoardsPage({ params }: BoardPageProps) {
                 <hr className="my-5" />
                 <div className="flex gap-10 h-full">
                     {board.sections?.map(section => (
-                        <Section
-                            key={section.section_id}
-                            section={section}
-                        ></Section>
+                        <Section key={section.section_id} section={section}>
+                            <div className="mt-5 space-y-4">
+                                {section.tasks.map(task => (
+                                    <Task key={task.task_id} task={task} />
+                                ))}
+                            </div>
+                        </Section>
                     ))}
                 </div>
+                <TaskModal />
             </main>
         </>
     );

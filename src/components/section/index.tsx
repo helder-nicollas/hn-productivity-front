@@ -3,12 +3,13 @@
 import { cn } from '@/lib/utils';
 import { ComponentProps, useState } from 'react';
 import { Button } from '../ui/button';
-import { Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { ISection } from '@/types/section';
 import { useMutation } from '@tanstack/react-query';
 import { fetcher } from '@/utils/api';
 import { deleteSection } from './delete-section';
+import Link from 'next/link';
 
 type SectionProps = ComponentProps<'div'> & {
     section: ISection;
@@ -77,15 +78,29 @@ function Section({
                     value={title}
                     onChange={e => handleChangeTitle(e.target.value)}
                 />
-                <Button
-                    variant="ghost"
-                    className="hover:text-destructive text-red-600"
-                    onClick={handleDeleteSection}
-                >
-                    <Trash2 />
-                </Button>
+                <div className="flex">
+                    <Button
+                        variant="ghost"
+                        className="hover:text-destructive text-red-600"
+                        onClick={handleDeleteSection}
+                    >
+                        <Trash2 />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        className="hover:text-emerald-300/80 text-emerald-300"
+                        asChild
+                    >
+                        <Link
+                            href={`?create-task=${section.board_id},${section.section_id}`}
+                        >
+                            <Plus />
+                        </Link>
+                    </Button>
+                </div>
             </div>
-            <div className="mt-5">{children}</div>
+
+            {children}
         </div>
     );
 }

@@ -18,7 +18,7 @@ export default async function Home() {
                     </div>
                 </Container>
             </Header>
-            <main className="min-h-screen flex justify-center items-center overflow-x-hidden relative">
+            <main className="min-h-screen flex w-full justify-center items-center overflow-x-hidden relative">
                 <div className="absolute top-[28%]">
                     <HeroPattern />
                 </div>
