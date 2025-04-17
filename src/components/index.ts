@@ -20,4 +20,3 @@ export * from './task';
 export * from './create-section';
 export * from './task-modal';
 export * from './sections-list';
-export * from './sidebar-boards-list-button';

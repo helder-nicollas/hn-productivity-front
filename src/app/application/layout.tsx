@@ -4,7 +4,6 @@ import {
     Header,
     Sidebar,
     SidebarBoardsList,
-    SidebarBoardsListSkeleton,
 } from '@/components';
 import { Input } from '@/components/ui/input';
 import {
@@ -16,9 +15,9 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
+
 import { Search } from 'lucide-react';
 import { cookies } from 'next/headers';
-import { Suspense } from 'react';
 
 export default async function AppLayout({
     children,
@@ -57,11 +56,7 @@ export default async function AppLayout({
                                     <Search className="absolute top-[10px] opacity-50 size-5 right-2" />
                                 </div>
                                 <SidebarMenu>
-                                    <Suspense
-                                        fallback={<SidebarBoardsListSkeleton />}
-                                    >
-                                        <SidebarBoardsList />
-                                    </Suspense>
+                                    <SidebarBoardsList />
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>

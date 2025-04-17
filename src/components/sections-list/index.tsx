@@ -188,6 +188,13 @@ function SectionsList({ sections }: SectionsListProps) {
         setActiveTask(null);
     };
 
+    if (!sections.length)
+        return (
+            <h1 className="opacity-30 text-3xl">
+                Nenhuma seção foi cadastrada.
+            </h1>
+        );
+
     return (
         <DndContext
             onDragEnd={handleDragEnd}

@@ -4,7 +4,7 @@
 import { IBoard } from '@/types/board';
 import { BookCheckIcon } from 'lucide-react';
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetcher } from '@/utils/api';
 import { useSession } from 'next-auth/react';
 
@@ -17,6 +17,7 @@ function BoardHeaderInputs({ board }: BoardHeaderInputsProps) {
     const [boardDescription, setBoardDescription] = useState(
         board.description ? board.description : '',
     );
+    const queryClient = useQueryClient();
     const [time, setTime] = useState<any>();
     const { data } = useSession();
 
@@ -24,7 +25,7 @@ function BoardHeaderInputs({ board }: BoardHeaderInputsProps) {
 
     const { mutate } = useMutation({
         mutationFn: async () => {
-            fetcher(`/boards/${board.board_id}`, {
+            return fetcher(`/boards/${board.board_id}`, {
                 body: JSON.stringify({
                     title: boardTitle,
                     description: boardDescription,
@@ -32,6 +33,26 @@ function BoardHeaderInputs({ board }: BoardHeaderInputsProps) {
                 method: 'PUT',
                 token,
             });
+        },
+        onSuccess: () => {
+            queryClient.setQueryData(
+                ['boards'],
+                (state: { data: IBoard[] }) => {
+                    const searchedBoardIndex = state.data.findIndex(
+                        currentBoard =>
+                            currentBoard.board_id === board.board_id,
+                    );
+
+                    const newBoards = [...state.data];
+
+                    newBoards[searchedBoardIndex] = {
+                        ...newBoards[searchedBoardIndex],
+                        title: boardTitle,
+                    };
+                    console.log(newBoards);
+                    return { ...state, data: newBoards };
+                },
+            );
         },
         onError: error => {
             console.log(error);
