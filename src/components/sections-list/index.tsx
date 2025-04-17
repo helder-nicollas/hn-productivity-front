@@ -11,7 +11,7 @@ import {
     DragStartEvent,
     UniqueIdentifier,
 } from '@dnd-kit/core';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { ITask } from '@/types/task';
 import { useMutation } from '@tanstack/react-query';
@@ -34,6 +34,7 @@ function SectionsList({ sections }: SectionsListProps) {
     const [currentSections, setCurrentSections] = useState(sections || []);
     const [activeTask, setActiveTask] = useState<ITask | null>(null);
     const [emptySection, setEmptySection] = useState<ISection | null>(null);
+    const previousSectionsRef = useRef(sections || []);
     const [mounted, setMounted] = useState(false);
     const params = useParams();
     const session = useSession();
@@ -137,18 +138,20 @@ function SectionsList({ sections }: SectionsListProps) {
         );
     };
     const handleDragStart = (event: DragStartEvent) => {
+        previousSectionsRef.current = structuredClone(currentSections);
         setActiveTask(event.active.data.current as ITask);
     };
 
     const handleDragCancel = () => {
         setActiveTask(null);
+        setEmptySection(null);
     };
 
     const handleDragOver = (event: DragOverEvent) => {
         const { active, over } = event;
-
         if (!active || !over) return;
 
+        const sourceSection = getTaskSection(active.id);
         const activeTask = active.data?.current as ITask;
 
         const isOverSection = over.data.current?.type === 'section';
@@ -162,6 +165,7 @@ function SectionsList({ sections }: SectionsListProps) {
                 task => task.task_id !== active.id,
             );
 
+            if (!activeTask) return;
             activeTask.section_id = over.data.current?.section_id;
 
             setCurrentSections(prevSections =>
@@ -183,8 +187,6 @@ function SectionsList({ sections }: SectionsListProps) {
             );
             return;
         }
-
-        const sourceSection = getTaskSection(active.id);
         const targetSection = getTaskSection(over.id);
 
         if (!sourceSection || !targetSection) return;
@@ -230,9 +232,17 @@ function SectionsList({ sections }: SectionsListProps) {
 
     const handleDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
-        console.log(over, active);
 
         if (!active || !over) return;
+
+        if (!active.data.current?.task_id || !over.data.current?.task_id) {
+            if (previousSectionsRef.current)
+                setCurrentSections(previousSectionsRef.current);
+            setEmptySection(null);
+            setActiveTask(null);
+            previousSectionsRef.current = [];
+            return;
+        }
 
         const activeSection = getTaskSection(active.id);
         const overSection = getTaskSection(over.id);
@@ -249,7 +259,6 @@ function SectionsList({ sections }: SectionsListProps) {
         const newOverSectionTasks = [...overSection.tasks];
 
         // Empty Section use case
-
         if (emptySection) {
             const [removedTask] = newActiveSectionTasks.splice(activeIndex, 1);
             mutateAsync({
@@ -260,55 +269,57 @@ function SectionsList({ sections }: SectionsListProps) {
                 destinationSectionId: emptySection.section_id,
                 destinationTasksList: [removedTask.task_id],
             });
-        } else {
-            // Same Section use case
-            if (activeSection?.section_id === overSection?.section_id) {
-                const newTasks = arrayMove(
-                    activeSection.tasks,
-                    activeIndex,
-                    overIndex,
-                );
-
-                updateSameSectionTasks({
-                    sectionId: overSection.section_id,
-                    newTasks,
-                });
-
-                mutateAsync({
-                    sourceSectionId: activeSection.section_id,
-                    sourceTasksList: newTasks.map(task => task.task_id),
-                    destinationSectionId: overSection.section_id,
-                    destinationTasksList: newTasks.map(task => task.task_id),
-                });
-            } else {
-                const [removedTask] = newActiveSectionTasks.splice(
-                    activeIndex,
-                    1,
-                );
-                newOverSectionTasks.splice(overIndex, 0, removedTask);
-
-                mutateAsync({
-                    sourceSectionId: activeSection.section_id,
-                    sourceTasksList: newActiveSectionTasks.map(
-                        task => task.task_id,
-                    ),
-                    destinationSectionId: overSection.section_id,
-                    destinationTasksList: newOverSectionTasks.map(
-                        task => task.task_id,
-                    ),
-                });
-
-                updateDifferentsSectionsTasks({
-                    activeSectionId: activeSection.section_id,
-                    newActiveSectionTasks,
-                    newOverSectionTasks,
-                    overSectionId: overSection.section_id,
-                });
-            }
+            setActiveTask(null);
+            setEmptySection(null);
+            previousSectionsRef.current = [];
+            return;
         }
 
+        // Same Section use case
+        if (activeSection?.section_id === overSection?.section_id) {
+            const newTasks = arrayMove(
+                activeSection.tasks,
+                activeIndex,
+                overIndex,
+            );
+
+            updateSameSectionTasks({
+                sectionId: overSection.section_id,
+                newTasks,
+            });
+
+            mutateAsync({
+                sourceSectionId: activeSection.section_id,
+                sourceTasksList: newTasks.map(task => task.task_id),
+                destinationSectionId: overSection.section_id,
+                destinationTasksList: newTasks.map(task => task.task_id),
+            });
+        } else {
+            // Differents Sections use case
+            const [removedTask] = newActiveSectionTasks.splice(activeIndex, 1);
+            newOverSectionTasks.splice(overIndex, 0, removedTask);
+
+            mutateAsync({
+                sourceSectionId: activeSection.section_id,
+                sourceTasksList: newActiveSectionTasks.map(
+                    task => task.task_id,
+                ),
+                destinationSectionId: overSection.section_id,
+                destinationTasksList: newOverSectionTasks.map(
+                    task => task.task_id,
+                ),
+            });
+
+            updateDifferentsSectionsTasks({
+                activeSectionId: activeSection.section_id,
+                newActiveSectionTasks,
+                newOverSectionTasks,
+                overSectionId: overSection.section_id,
+            });
+        }
         setActiveTask(null);
         setEmptySection(null);
+        previousSectionsRef.current = [];
     };
 
     if (!mounted) return null;
@@ -329,18 +340,19 @@ function SectionsList({ sections }: SectionsListProps) {
             collisionDetection={closestCorners}
         >
             {currentSections?.map(section => (
-                <Section key={section.section_id} section={section}>
-                    <SortableContext
-                        id={section.section_id}
-                        items={section.tasks.map(task => task.task_id)}
-                    >
+                <SortableContext
+                    key={section.section_id}
+                    id={section.section_id}
+                    items={section.tasks.map(task => task.task_id)}
+                >
+                    <Section section={section}>
                         <div className="mt-5 space-y-4 h-full">
                             {section.tasks.map(task => (
                                 <Task key={task.task_id} task={task} />
                             ))}
                         </div>
-                    </SortableContext>
-                </Section>
+                    </Section>
+                </SortableContext>
             ))}
             <DragOverlay>
                 {activeTask ? (
