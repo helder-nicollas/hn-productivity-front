@@ -7,6 +7,7 @@ import { Loading } from '../loading';
 
 function CreateBoard() {
     const [_, dispatch, isPending] = useActionState(createBoard, null);
+
     return (
         <form action={dispatch}>
             <SidebarGroupAction
