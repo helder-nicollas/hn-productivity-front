@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { cn } from '@/lib/utils';
-import { ComponentProps, useState } from 'react';
+import { ComponentPropsWithoutRef, useActionState, useState } from 'react';
 import { Button } from '../ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -9,22 +9,33 @@ import { ISection } from '@/types/section';
 import { useMutation } from '@tanstack/react-query';
 import { fetcher } from '@/utils/api';
 import { deleteSection } from './delete-section';
+import { useDroppable } from '@dnd-kit/core';
+import { Loading } from '../loading';
 import Link from 'next/link';
 
-type SectionProps = ComponentProps<'div'> & {
+type SectionProps = ComponentPropsWithoutRef<'div'> & {
     section: ISection;
 };
 
-function Section({
-    className,
-    ref,
-    children,
-    section,
-    ...props
-}: SectionProps) {
+function Section({ className, children, section, ...props }: SectionProps) {
     const [title, setTitle] = useState(section.title || '');
     const [time, setTime] = useState<any>();
+    const deleteSectionWithParams = deleteSection.bind(null, {
+        boardId: section.board_id,
+        sectionId: section.section_id,
+    });
+    const [_, dispatch, isPending] = useActionState(
+        deleteSectionWithParams,
+        null,
+    );
     const { data } = useSession();
+    const { setNodeRef } = useDroppable({
+        id: section.section_id,
+        data: {
+            ...section,
+            type: 'section',
+        },
+    });
 
     const token = data?.user.accessToken as string;
 
@@ -55,17 +66,9 @@ function Section({
         setTime(timeout);
     };
 
-    const handleDeleteSection = async () => {
-        await deleteSection({
-            boardId: section.board_id,
-            sectionId: section.section_id,
-        });
-    };
-
     return (
         <div
             {...props}
-            ref={ref}
             className={cn(
                 'bg-background border w-72 h-full rounded-xl shadow-md p-4',
                 className,
@@ -79,13 +82,15 @@ function Section({
                     onChange={e => handleChangeTitle(e.target.value)}
                 />
                 <div className="flex">
-                    <Button
-                        variant="ghost"
-                        className="hover:text-destructive text-red-600"
-                        onClick={handleDeleteSection}
-                    >
-                        <Trash2 />
-                    </Button>
+                    <form action={dispatch}>
+                        <Button
+                            variant="ghost"
+                            className="hover:text-destructive text-red-600"
+                            disabled={isPending}
+                        >
+                            {isPending ? <Loading /> : <Trash2 />}
+                        </Button>
+                    </form>
                     <Button
                         variant="ghost"
                         className="hover:text-emerald-300/80 text-emerald-300"
@@ -99,8 +104,9 @@ function Section({
                     </Button>
                 </div>
             </div>
-
-            {children}
+            <div className="mt-5 space-y-4 h-full" ref={setNodeRef}>
+                {children}
+            </div>
         </div>
     );
 }

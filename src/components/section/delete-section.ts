@@ -22,7 +22,7 @@ export async function deleteSection({
             token,
         });
 
-        revalidatePath('/');
+        revalidatePath(`/application/boards/${boardId}`);
         return {
             message: 'Seção deletada com sucesso.',
             type: 'success',

@@ -1,15 +1,11 @@
-import { SidebarMenuButton, SidebarMenuItem } from '../ui/sidebar';
+import { SidebarMenuItem } from '../ui/sidebar';
 import { fetcher } from '@/utils/api';
 import { getSession } from '@/utils/auth';
 import { IBoard } from '@/types/board';
 import { SidebarBoardsListSkeleton } from './skeleton';
-import Link from 'next/link';
+import { SidebarBoardsListButton } from '../sidebar-boards-list-button';
 
-type SidebarBoardsListProps = {
-    currentBoardId: string;
-};
-
-async function SidebarBoardsList({ currentBoardId }: SidebarBoardsListProps) {
+async function SidebarBoardsList() {
     const session = await getSession();
     const token = session?.user.accessToken as string;
 
@@ -17,17 +13,9 @@ async function SidebarBoardsList({ currentBoardId }: SidebarBoardsListProps) {
 
     return (
         <>
-            {boards.map(board => (
+            {boards?.map(board => (
                 <SidebarMenuItem key={board.board_id}>
-                    <SidebarMenuButton
-                        asChild
-                        data-active={board.board_id === currentBoardId}
-                        className="rounded"
-                    >
-                        <Link href={`/application/boards/${board.board_id}`}>
-                            <span>{board.title}</span>
-                        </Link>
-                    </SidebarMenuButton>
+                    <SidebarBoardsListButton board={board} />
                 </SidebarMenuItem>
             ))}
         </>

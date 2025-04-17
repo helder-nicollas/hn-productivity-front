@@ -38,11 +38,11 @@ export function LoginForm() {
 
     const handleLogin = async (data: FormSchema) => {
         const { email, password } = data;
+
         const result = await signIn('credentials', {
             email,
             password,
             redirect: false,
-            callbackUrl: '/application/boards',
         });
 
         if (result?.status === 401) {

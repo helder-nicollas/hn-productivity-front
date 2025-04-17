@@ -1,23 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import { Plus } from 'lucide-react';
 import { SidebarGroupAction } from '../ui/sidebar';
 import { useActionState } from 'react';
+import { createBoard } from './action';
+import { Loading } from '../loading';
 
-type CreateBoardProps = {
-    action(): void;
-};
-
-function CreateBoard({ action }: CreateBoardProps) {
-    const [_, dispatch, isPending] = useActionState(action, null);
-
+function CreateBoard() {
+    const [_, dispatch, isPending] = useActionState(createBoard, null);
     return (
         <form action={dispatch}>
             <SidebarGroupAction
                 className="cursor-pointer size-8"
                 disabled={isPending}
             >
-                <Plus />
+                {isPending ? <Loading /> : <Plus />}
             </SidebarGroupAction>
         </form>
     );

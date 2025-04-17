@@ -2,13 +2,19 @@
 import { useActionState } from 'react';
 import { Button } from '../ui/button';
 import { Loading } from '../loading';
+import { createSection } from './action';
+import { useParams } from 'next/navigation';
 
-type CreateSectionProps = {
-    action(): void;
-};
-
-function CreateSection({ action }: CreateSectionProps) {
-    const [_, dispatch, isPending] = useActionState(action, null);
+function CreateSection() {
+    const params = useParams();
+    const createSectionWithBoardId = createSection.bind(
+        null,
+        String(params.boardId),
+    );
+    const [_, dispatch, isPending] = useActionState(
+        createSectionWithBoardId,
+        null,
+    );
     return (
         <form action={dispatch}>
             <Button
