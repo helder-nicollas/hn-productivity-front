@@ -37,8 +37,8 @@ function Task({ className, task, ...props }: TaskProps) {
                 style={{
                     transform: CSS.Translate.toString(transform),
                     transition,
-                    opacity: isDragging ? 0.5 : 1, // 👈 apenas mudar opacidade!
-                    pointerEvents: isDragging ? 'none' : undefined, // 👈 impedir clique
+                    opacity: isDragging ? 0.5 : 1,
+                    pointerEvents: isDragging ? 'none' : undefined,
                 }}
             />
         );
