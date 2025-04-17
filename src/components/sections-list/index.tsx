@@ -151,82 +151,58 @@ function SectionsList({ sections }: SectionsListProps) {
         const { active, over } = event;
         if (!active || !over) return;
 
-        const sourceSection = getTaskSection(active.id);
+        const activeSection = getTaskSection(active.id);
         const activeTask = active.data?.current as ITask;
+        const overSection = getTaskSection(over.id);
+        const isEmptySection = over.data.current?.type === 'section';
 
-        const isOverSection = over.data.current?.type === 'section';
-
-        if (isOverSection) {
+        if (isEmptySection && activeSection) {
             setEmptySection(over.data.current as ISection);
-            const sourceSection = getTaskSection(active.id);
-            if (!sourceSection) return;
+            activeTask.section_id = over.data.current?.section_id;
+            const overSection = over.data.current;
 
-            const updatedSourceTasks = sourceSection.tasks!.filter(
+            const newActiveSectionTasks = activeSection.tasks!.filter(
                 task => task.task_id !== active.id,
             );
 
             if (!activeTask) return;
-            activeTask.section_id = over.data.current?.section_id;
 
-            setCurrentSections(prevSections =>
-                prevSections.map(section => {
-                    if (section.section_id === sourceSection?.section_id) {
-                        return {
-                            ...section,
-                            tasks: updatedSourceTasks,
-                        };
-                    }
-                    if (section.section_id === over.data.current?.section_id) {
-                        return {
-                            ...section,
-                            tasks: [activeTask],
-                        };
-                    }
-                    return section;
-                }),
-            );
+            updateDifferentsSectionsTasks({
+                activeSectionId: activeSection.section_id,
+                newActiveSectionTasks,
+                newOverSectionTasks: [activeTask],
+                overSectionId: overSection?.section_id,
+            });
             return;
         }
-        const targetSection = getTaskSection(over.id);
 
-        if (!sourceSection || !targetSection) return;
+        if (!activeSection || !overSection) return;
 
-        if (sourceSection.section_id !== targetSection.section_id) {
-            const sourceTasks = sourceSection.tasks;
-            const targetTasks = targetSection.tasks;
+        const isDifferentsSection =
+            activeSection.section_id !== overSection.section_id;
 
-            const updatedSourceTasks = sourceTasks.filter(
-                task => task.task_id !== active.id,
+        if (isDifferentsSection) {
+            activeTask.section_id = over.data.current?.section_id;
+            const newActiveSectionTasks = [...activeSection.tasks];
+            const newOverSectionTasks = [...overSection.tasks];
+
+            const activeIndex = newActiveSectionTasks.findIndex(
+                task => task.task_id === active.id,
             );
+            newActiveSectionTasks.splice(activeIndex, 1);
 
-            const overIndex = targetTasks.findIndex(
+            const overIndex = newOverSectionTasks.findIndex(
                 task => task.task_id === over.id,
             );
 
-            activeTask.section_id = over.data.current?.section_id;
-            const updatedTargetTasks = [
-                ...targetTasks.slice(0, overIndex),
-                activeTask,
-                ...targetTasks.slice(overIndex),
-            ];
+            newOverSectionTasks.splice(overIndex, 0, activeTask);
 
-            setCurrentSections(prevSections =>
-                prevSections.map(section => {
-                    if (section.section_id === sourceSection?.section_id) {
-                        return {
-                            ...section,
-                            tasks: updatedSourceTasks,
-                        };
-                    }
-                    if (section.section_id === targetSection?.section_id) {
-                        return {
-                            ...section,
-                            tasks: updatedTargetTasks,
-                        };
-                    }
-                    return section;
-                }),
-            );
+            updateDifferentsSectionsTasks({
+                activeSectionId: activeSection.section_id,
+                newActiveSectionTasks,
+                newOverSectionTasks,
+                overSectionId: overSection?.section_id,
+            });
         }
     };
 
