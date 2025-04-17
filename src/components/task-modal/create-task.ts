@@ -1,7 +1,7 @@
 'use server';
 
 import { IActionResponse } from '@/types/action-response';
-import { FieldErrors, FormSchema } from '.';
+import { FormSchema } from '.';
 import { fetcher } from '@/utils/api';
 import { getSession } from '@/utils/auth';
 import { revalidatePath } from 'next/cache';
@@ -15,7 +15,7 @@ export async function createTask({
     boardId,
     sectionId,
     ...data
-}: ICreateTaskParams): Promise<IActionResponse<FieldErrors>> {
+}: ICreateTaskParams): Promise<IActionResponse> {
     try {
         const session = await getSession();
         const token = session?.user.accessToken as string;
