@@ -104,8 +104,11 @@ function Section({ className, children, section, ...props }: SectionProps) {
                     </Button>
                 </div>
             </div>
+            <div className="px-4">
+                <hr className="my-3" />
+            </div>
             <div
-                className="mt-5 space-y-4 overflow-auto relative px-4 scroll-style h-[calc(100%-60px)]"
+                className="space-y-4 overflow-auto relative px-4 scroll-style h-[calc(100%-60px)]"
                 ref={setNodeRef}
             >
                 {children}

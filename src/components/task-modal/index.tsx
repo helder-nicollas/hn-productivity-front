@@ -1,4 +1,10 @@
 'use client';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import MDEditor, { commands } from '@uiw/react-md-editor';
+import rehypeSanitize from 'rehype-sanitize';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -8,18 +14,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { createTask } from './create-task';
-import MDEditor, { commands } from '@uiw/react-md-editor';
-import rehypeSanitize from 'rehype-sanitize';
 import './md-editor.css';
 import { Loading } from '../loading';
 import { Feedback } from '../feedback';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback } from 'react';
 
 const formSchema = z.object({
@@ -80,13 +78,13 @@ function TaskModal() {
                         <DialogDescription></DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name" className="text-right">
-                                Título
-                            </Label>
-                            <Input
+                        <div className="space-y-1">
+                            <input
+                                autoFocus
+                                className="col-span-3 w-full h-10 outline-0 text-xl data-[error=true]:border data-[error=true]:border-destructive data-[error=true]:px-2 rounded-md"
+                                placeholder="Título da sua tarefa"
+                                data-error={!!errors.title?.message}
                                 {...register('title')}
-                                className="col-span-3"
                             />
                             <Feedback message={errors.title?.message} />
                         </div>
@@ -94,6 +92,9 @@ function TaskModal() {
                             className="min-h-[500px] w-full"
                             value={content as string}
                             onChange={value => setValue('content', value)}
+                            textareaProps={{
+                                placeholder: 'Descreva sua tarefa aqui...',
+                            }}
                             commands={[
                                 commands.group(
                                     [
@@ -111,6 +112,9 @@ function TaskModal() {
                                     },
                                 ),
                                 commands.bold,
+                                commands.checkedListCommand,
+                                commands.orderedListCommand,
+                                commands.unorderedListCommand,
                                 commands.divider,
                                 commands.italic,
                                 commands.link,
@@ -128,7 +132,7 @@ function TaskModal() {
                             disabled={isSubmitting}
                         >
                             {' '}
-                            {isSubmitting ? <Loading /> : 'Save changes'}
+                            {isSubmitting ? <Loading /> : 'Salvar'}
                         </Button>
                     </DialogFooter>
                 </form>
