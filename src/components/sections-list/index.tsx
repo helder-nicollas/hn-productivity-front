@@ -322,11 +322,9 @@ function SectionsList({ sections }: SectionsListProps) {
                     items={section.tasks.map(task => task.task_id)}
                 >
                     <Section section={section}>
-                        <div className="mt-5 space-y-4 h-full">
-                            {section.tasks.map(task => (
-                                <Task key={task.task_id} task={task} />
-                            ))}
-                        </div>
+                        {section.tasks.map(task => (
+                            <Task key={task.task_id} task={task} />
+                        ))}
                     </Section>
                 </SortableContext>
             ))}

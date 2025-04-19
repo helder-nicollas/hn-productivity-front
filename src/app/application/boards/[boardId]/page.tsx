@@ -27,13 +27,13 @@ export default async function BoardsPage({ params }: BoardPageProps) {
     if (!board) return notFound();
 
     return (
-        <main className="mt-24 px-5 h-[calc(100% - 160px)] w-full pb-10 flex flex-col">
+        <main className="mt-24 px-5 w-full flex flex-col">
             <header className="flex flex-col w-full">
                 <BoardHeaderInputs board={board} />
                 <CreateSection />
             </header>
             <hr className="my-5" />
-            <div className="flex gap-10 h-full">
+            <div className="flex gap-10 h-[calc(100vh-320px)]">
                 <SectionsList sections={board.sections} />
             </div>
             <TaskModal />

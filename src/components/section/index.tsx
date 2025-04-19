@@ -70,11 +70,11 @@ function Section({ className, children, section, ...props }: SectionProps) {
         <div
             {...props}
             className={cn(
-                'bg-background border w-72 h-full rounded-xl shadow-md p-4',
+                'bg-background border w-72 min-h-full rounded-xl shadow-md py-4',
                 className,
             )}
         >
-            <div className="flex gap-2">
+            <div className="flex gap-2 px-4">
                 <input
                     className="font-bold text-xl w-full outline-0"
                     placeholder="Seção sem título"
@@ -104,7 +104,10 @@ function Section({ className, children, section, ...props }: SectionProps) {
                     </Button>
                 </div>
             </div>
-            <div className="mt-5 space-y-4 h-full" ref={setNodeRef}>
+            <div
+                className="mt-5 space-y-4 overflow-auto relative px-4 scroll-style h-[calc(100%-60px)]"
+                ref={setNodeRef}
+            >
                 {children}
             </div>
         </div>

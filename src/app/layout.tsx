@@ -30,7 +30,7 @@ export default async function RootLayout({
     return (
         <html lang="en" className="dark">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <Providers>
                     <SidebarProvider defaultOpen={defaultOpen}>
